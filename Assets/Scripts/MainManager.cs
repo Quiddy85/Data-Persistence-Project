@@ -11,6 +11,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text bestScoreAndPlayerNameText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -36,6 +37,12 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        // Get savedata
+        if (SaveData.Instance != null)
+        {
+            bestScoreAndPlayerNameText.text = "Best Score : " + SaveData.Instance.highScorePlayerNameText + " : " +  SaveData.Instance.highScore;
+        }
     }
 
     private void Update()
@@ -55,6 +62,20 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            // Put the score and name into the text field, save the score and write to file
+            if (m_Points > SaveData.Instance.highScore)
+            {
+                SaveData.Instance.highScore = m_Points;
+                SaveData.Instance.highScorePlayerNameText = SaveData.Instance.playerNameText;
+            }
+            
+            // Display the name and highscore again
+            bestScoreAndPlayerNameText.text = "Best Score : " + SaveData.Instance.highScorePlayerNameText + " : " + SaveData.Instance.highScore;
+
+            // Save the data to file
+            SaveData.Instance.SaveInformation();
+
+            // Restart game
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
